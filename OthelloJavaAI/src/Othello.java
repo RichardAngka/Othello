@@ -1,17 +1,37 @@
 class Othello extends Main {
-    int row, col;
+    int row, col, countX, countO, countEmpty, xC, yC;
     int count=8;
     char playerX = 'X';
     char playerO = 'O';
     char[][] board = new char[count][count];
     char turn;
-    char empty=32;
+    char empty=' ';
     int []countTable = new int[count];
+    int [][]AICount = new int[count][count];
 
     void ClearBoard(){
         for (row=0; row<count; row++){
             for (col=0; col<count; col++){
                 board[col][row]=empty;
+            }
+        }
+    }
+
+    void CountPlayer(){
+        countEmpty=0;
+        countX=0;
+        countO=0;
+        for(row=0; row<count; row++){
+            for(col=0; col<count; col++){
+                if(board[col][row]==playerX){
+                    countX++;
+                }
+                else if(board[col][row]==playerO){
+                    countO++;
+                }
+                else{
+                    countEmpty++;
+                }
             }
         }
     }
@@ -180,7 +200,7 @@ class Othello extends Main {
                 countTable[7]++;
             }
         }
-        for(int i=0; i<4; i++){
+        for(int i=0; i<count; i++){
             totalCount+=countTable[i];
         }
         return totalCount;
@@ -192,49 +212,87 @@ class Othello extends Main {
         y=yp-1;
         for (int i=0; i<countTable[0]; i++){
             board[y][x]=turn;
+            y--;
         }
         //arah kanan = 1
         x=xp+1;
         y=yp;
         for (int i=0; i<countTable[1]; i++){
             board[y][x]=turn;
+            x++;
         }
         //arah bawah = 2
         x=xp;
         y=yp+1;
         for (int i=0; i<countTable[2]; i++){
             board[y][x]=turn;
+            y++;
         }
         //arah kiri = 3
         x=xp-1;
         y=yp;
         for (int i=0; i<countTable[3]; i++){
             board[y][x]=turn;
+            x--;
         }
         //atas kiri = 4
         x=xp-1;
         y=yp-1;
         for (int i=0; i<countTable[4]; i++){
             board[y][x]=turn;
+            x--;
+            y--;
         }
         //atas kanan = 5
         x=xp+1;
         y=yp-1;
         for (int i=0; i<countTable[5]; i++){
             board[y][x]=turn;
+            x++;
+            y--;
         }
         //bawah kanan = 6
         x=xp+1;
         y=yp+1;
         for (int i=0; i<countTable[6]; i++){
             board[y][x]=turn;
+            x++;
+            y++;
         }
         //bawah kiri = 7
         x=xp-1;
         y=yp+1;
         for (int i=0; i<countTable[7]; i++){
             board[y][x]=turn;
+            x--;
+            y++;
         }
     }
 
+    void ComputerCount(){
+        int x,y, greedyMax = 0;
+        for(y=0; y<count; y++){
+            for(x=0; x<count; x++){
+                if(board[y][x]==empty){
+                    if(greedyMax<CalculateGained(y,x)){
+                        greedyMax = CalculateGained(y,x);
+                        xC = x;
+                        yC = y;
+                    }
+                }
+            }
+        }
+    }
+
+    void ComputerPlay(){
+        PrintBoard();
+        System.out.println("Press any key for computer to play");
+        System.out.flush();
+        ComputerCount();
+        board[xC][yC] = turn;
+        CalculateGained(yC, xC);
+        ChangeColor(yC, xC);
+        turn = playerX;
+        CountPlayer();
+    }
 }
